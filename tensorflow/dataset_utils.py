@@ -27,7 +27,6 @@ def read_data_set(path):
         labels.append(label[10])
 
         labels_array.append(labels)
-        # print(labels)
 
     return images_array, labels_array
 

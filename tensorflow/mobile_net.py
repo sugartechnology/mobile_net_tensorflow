@@ -2,15 +2,15 @@ from tensorflow import keras
 import tensorflow as tf
 
 
-def my_IoU(y_pred, y_true):
-    """
-        IoU metric used in semantic segmentation.
-    """
-    inter = tf.reduce_sum(y_pred * y_true, axis=(1, 2))
-    uni = tf.reduce_sum(y_pred + y_true, axis=(1, 2)) - inter
-    return tf.reduce_mean(inter / uni)
+def mobile_loss_function(y_pred, y_true):
+    
 
-
+    kosul = tf.where(tf.equal(y_true[..., 0:1], tf.constant(0.0)), tf.square(y_pred[..., 0:1] - y_true[..., 0:1]), tf.square(y_pred[..., 0:] - y_true[..., 0:]))
+    #p = tf.print(kosul, [kosul,  kosul.shape], "Debug output: ")
+    farklarinin_koku = tf.reduce_mean(kosul, 1)    
+    #farklarinin_karesi = tf.reduce_sum(tf.where(tf.equal(y_true[..., 0:1], tf.constant(0.0)), tf.constant(0.0), tf.square(y_pred[..., 1:3] - y_true[..., 1:3])))
+    return tf.reduce_sum(farklarinin_koku)
+   
 def mobile_net_block(x, f, s=1):
     x = keras.layers.DepthwiseConv2D(3, strides=s, padding="same")(x)
     x = keras.layers.BatchNormalization()(x)
@@ -45,7 +45,7 @@ def mobile_net(input_shape, num_classes):
     x = mobile_net_block(x, 1024)
 
     x = keras.layers.GlobalAvgPool2D()(x)
-    #x = keras.layers.Dropout(0.1)(x)
+    x = keras.layers.Dropout(0.1)(x)
 
     output = keras.layers.Dense(num_classes, activation="linear")(x)
     model = keras.Model(input, output)
@@ -55,5 +55,6 @@ def mobile_net(input_shape, num_classes):
         learning_rate=1e-6,
         name='Adam'
     )
-    model.compile(optimizer=adamOptimizer, loss="mse", metrics=["accuracy"])
+
+    model.compile(optimizer=adamOptimizer, loss=mobile_loss_function, metrics=["accuracy"])
     return model

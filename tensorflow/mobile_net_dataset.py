@@ -16,7 +16,7 @@ def CreateMobileNetGent(label_path, batch_size=32, target_size=(224, 224)):
                                              directory=None,
                                              x_col='image',
                                              y_col=[
-                                                 'x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
+                                                 'c','x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
                                              batch_size=batch_size,
                                              class_mode='raw',
                                              classes=None,
@@ -45,7 +45,7 @@ class MobileNetDataGen(tf.keras.utils.Sequence):
                                                  directory=None,
                                                  x_col='image',
                                                  y_col=[
-                                                     'x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
+                                                     'c','x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
                                                  batch_size=batch_size,
                                                  class_mode='raw',
                                                  classes=None,

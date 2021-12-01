@@ -10,13 +10,14 @@ def display(display_list, title, results):
 
         res = results[i]
         print('{} {}'.format(title[i], res))
-        cx = res[0] * 224
-        cy = (1 - res[1]) * 224
+        cx = res[1] * 224
+        cy = (1 - res[2]) * 224
         plt.scatter(cx, cy)
-        plt.scatter(cx + res[2] * 224, cy + res[3] * 224)
-        plt.scatter(cx + res[4] * 224, cy + res[5] * 224)
-        plt.scatter(cx + res[6] * 224, cy + res[7] * 224)
-        plt.scatter(cx + res[8] * 224, cy + res[9] * 224)
+        plt.scatter(cx + res[3] * 224, cy - res[4] * 224)
+        plt.scatter(cx + res[5] * 224, cy - res[6] * 224)
+        plt.scatter(cx + res[7] * 224, cy - res[8] * 224)
+        plt.scatter(cx + res[9] * 224, cy - res[10] * 224)
         plt.axis('off')
+        plt.show()
 
-    plt.show()
+    
