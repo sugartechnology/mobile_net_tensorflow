@@ -10,7 +10,8 @@ def CreateMobileNetGent(label_path, batch_size=32, target_size=(224, 224)):
         label_path)
 
     image_generator = tf.keras.preprocessing.image.ImageDataGenerator(
-        rescale=1./255)
+        rescale=1./255,
+        validation_split=0.1)
 
     df = image_generator.flow_from_dataframe(data_frame,
                                              directory=None,
@@ -41,7 +42,7 @@ class MobileNetDataGen(tf.keras.utils.Sequence):
         image_generator = tf.keras.preprocessing.image.ImageDataGenerator(
             rescale=1./255)
 
-        df = image_generator.flow_from_dataframe(self.data_frame,
+        df = image_generator.flow_from_directory(self.data_frame,
                                                  directory=None,
                                                  x_col='image',
                                                  y_col=[

@@ -77,9 +77,10 @@ def save_model(s_path, m_path):
     tf.saved_model.save(model, mobilenet_save_path)
 
 
-def train_model(s_path, w_path,  l_path, batch_size=32, epochs=5):
+def train_model(s_path, w_path,  l_path, batch_size=64, epochs=5):
 
     model = load_model(weights_path= w_path)
+    #model = load_model(save_path = s_path)
 
     ''''x, y = read_data_set(l_path)
     x = np.array([x])
@@ -92,6 +93,7 @@ def train_model(s_path, w_path,  l_path, batch_size=32, epochs=5):
     data_sets.batch(batch_size)
     data_sets.shuffle(5)'''
 
+    print(l_path)
     data_sets = CreateMobileNetGent(l_path, batch_size=batch_size)
 
     checkpoint_filepath = w_path
@@ -100,7 +102,7 @@ def train_model(s_path, w_path,  l_path, batch_size=32, epochs=5):
         save_weights_only=True,
         monitor='loss',
         mode='min',
-        save_freq=batch_size,
+        save_freq=batch_size * 100,
         save_best_only=True)
 
     logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -116,7 +118,7 @@ def train_model(s_path, w_path,  l_path, batch_size=32, epochs=5):
         epochs=epochs,
         callbacks=[tensorboard_callback, model_checkpoint_callback])
 
-    #model.save_weights(w_path)
+    model.save_weights(w_path)
     model.save(s_path)
     # model.summary()
 
@@ -186,12 +188,12 @@ if __name__ == "__main__":
         test_model(parsed_args.file_name)
     
     elif parsed_args.command == 'display':
-        test_image = read_test_image(os.path.join(test_image_path, '17750.jpg'))
+        test_image = read_test_image(os.path.join(test_image_path, '10010.jpg'))
         test_image = np.array([test_image])
         #labels = np.array([[1.0, 0.5115175,0.5042784,-0.04486451,0.03516448,0.0456779,-0.03639513,-0.0009806752,0.004245341,0.001017809,-0.00440630]])
         #labels = np.array([[1,0.4860586,0.4909233,0.07650164,0.02938423,-0.08001593,-0.0320636,0.008848786,0.01121643,-0.009032428,-0.0114491]])
         #labels = np.array([[1,0.5109575,0.4996452,0.06958157,0.03746924,-0.06275624,-0.03573748,-0.03004959,-0.004485548,0.03085494,0.0046057]])
-        labels = np.array([[1,0.5333063,0.8620007,0.02647889,-0.04577672,-0.01820099,0.04923594,-0.05761877,0.001753569,0.06322676,-0.00192427]])
+        labels = np.array([[1,0.1701979,0.2652104,-0.06756115,0.05552575,0.06555805,0.1032686,-0.05104199,-0.09671402,0.05564821,-0.0600368]])
         
         display(test_image, ['predict'], labels)
 

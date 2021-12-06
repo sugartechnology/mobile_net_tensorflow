@@ -4,10 +4,10 @@ import tensorflow as tf
 
 def mobile_loss_function(y_pred, y_true):
     
-
     kosul = tf.where(tf.equal(y_true[..., 0:1], tf.constant(0.0)), tf.square(y_pred[..., 0:1] - y_true[..., 0:1]), tf.square(y_pred[..., 0:] - y_true[..., 0:]))
     #p = tf.print(kosul, [kosul,  kosul.shape], "Debug output: ")
-    farklarinin_koku = tf.reduce_mean(kosul, 1)    
+    farklarinin_koku = tf.reduce_mean(kosul, 1)   
+    #p = tf.print(farklarinin_koku, [farklarinin_koku,  farklarinin_koku.shape], "Debug output: ")
     #farklarinin_karesi = tf.reduce_sum(tf.where(tf.equal(y_true[..., 0:1], tf.constant(0.0)), tf.constant(0.0), tf.square(y_pred[..., 1:3] - y_true[..., 1:3])))
     return tf.reduce_sum(farklarinin_koku)
    
@@ -45,7 +45,6 @@ def mobile_net(input_shape, num_classes):
     x = mobile_net_block(x, 1024)
 
     x = keras.layers.GlobalAvgPool2D()(x)
-    x = keras.layers.Dropout(0.1)(x)
 
     output = keras.layers.Dense(num_classes, activation="linear")(x)
     model = keras.Model(input, output)
