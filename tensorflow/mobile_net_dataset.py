@@ -17,7 +17,7 @@ def CreateMobileNetGent(label_path, batch_size=32, target_size=(224, 224)):
                                              directory=None,
                                              x_col='image',
                                              y_col=[
-                                                 'c','x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
+                                                 'c', 'x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
                                              batch_size=batch_size,
                                              class_mode='raw',
                                              classes=None,
@@ -46,7 +46,7 @@ class MobileNetDataGen(tf.keras.utils.Sequence):
                                                  directory=None,
                                                  x_col='image',
                                                  y_col=[
-                                                     'c','x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
+                                                     'c', 'x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
                                                  batch_size=batch_size,
                                                  class_mode='raw',
                                                  classes=None,
@@ -107,3 +107,31 @@ class MobileNetDataGen(tf.keras.utils.Sequence):
 
     def __len__(self):
         return self.n
+
+
+if __name__ == "__main__":
+
+    label_path = "/Users/yufae/Desktop/mobile_net_tensorflow/mobile_net_tensorflow/tensorflow/test.csv"
+
+    data_frame = pandas.read_csv(
+        label_path)
+
+    print(data_frame)
+
+    image_generator = tf.keras.preprocessing.image.ImageDataGenerator(
+        rescale=1./255,
+        validation_split=0.1)
+
+    df = image_generator.flow_from_dataframe(data_frame,
+                                             directory=None,
+                                             x_col='image',
+                                             y_col=[
+                                                 'c'],
+                                             batch_size=32,
+                                             class_mode='raw',
+                                             classes=None,
+                                             shuffle=True,
+                                             target_size=(224, 224))
+
+    for i, item in enumerate(df):
+        print(len(item[0]), len(item[1]), len(item[2]))

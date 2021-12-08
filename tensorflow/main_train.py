@@ -19,8 +19,6 @@ import sys
 from mobile_net_dataset import MobileNetDataGen
 from mobile_net_dataset import CreateMobileNetGent
 
-import matplotlib.pyplot as plt
-
 
 root_path = ''
 save_path = os.path.join(root_path, 'mobilenet/2')
@@ -44,7 +42,7 @@ def load_model(save_path=None, weights_path=None):
             print('***************************')
             print('creating model from scratch')
             model = mobile_net((224, 224, 3), 11)
-    
+
     elif weights_path is not None:
         model = mobile_net((224, 224, 3), 11)
         try:
@@ -56,16 +54,15 @@ def load_model(save_path=None, weights_path=None):
             # Logs the error appropriately. :
             print('***************************')
             print('creating model from scratch')
-    
-    #adamOptimizer = tf.keras.optimizers.Adam(
+
+    # adamOptimizer = tf.keras.optimizers.Adam(
     #        learning_rate=1e-4,
     #        name='Adam'
-    #)
-    #model.compile(optimizer=adamOptimizer, loss="mse",
+    # )
+    # model.compile(optimizer=adamOptimizer, loss="mse",
     #                  metrics=["accuracy"])
 
     return model
-
 
 
 def save_model(s_path, m_path):
@@ -79,7 +76,7 @@ def save_model(s_path, m_path):
 
 def train_model(s_path, w_path,  l_path, batch_size=64, epochs=5):
 
-    model = load_model(weights_path= w_path)
+    model = load_model(weights_path=w_path)
     #model = load_model(save_path = s_path)
 
     ''''x, y = read_data_set(l_path)
@@ -131,9 +128,9 @@ def test_model(file_name):
 
     # convert the image to an array
     test_image = img_to_array(test_image)
-    #print(img)
+    # print(img)
     test_image *= 1/255
-    #print(img)
+    # print(img)
     # expand dimensions so that it represents a single 'sample'
     test_image = expand_dims(test_image, axis=0)
     results = model(test_image)
@@ -153,9 +150,6 @@ def test_own(index):
     results = model(tf.constant(test_image))
     #display(test_image, ['real'], test_label)
     display(test_image, ['predict'], results)
-
-
-
 
 
 def create_arg_parser():
@@ -180,21 +174,22 @@ if __name__ == "__main__":
         i_path = parsed_args.image_path if parsed_args.image_path is not None else image_path
         w_path = parsed_args.model_path if parsed_args.model_path is not None else weights_path
         s_path = parsed_args.save_path if parsed_args.save_path is not None else save_path
-        epocs = int(parsed_args.epochs_num) if parsed_args.epochs_num is not None else 50
+        epocs = int(
+            parsed_args.epochs_num) if parsed_args.epochs_num is not None else 50
 
-        train_model(s_path, w_path,  l_path, epochs = epocs)
-        
+        train_model(s_path, w_path,  l_path, epochs=epocs)
+
     elif parsed_args.command == 'test':
         test_model(parsed_args.file_name)
-    
+
     elif parsed_args.command == 'display':
-        test_image = read_test_image(os.path.join(test_image_path, '10010.jpg'))
+        test_image = read_test_image(
+            os.path.join(test_image_path, '10010.jpg'))
         test_image = np.array([test_image])
         #labels = np.array([[1.0, 0.5115175,0.5042784,-0.04486451,0.03516448,0.0456779,-0.03639513,-0.0009806752,0.004245341,0.001017809,-0.00440630]])
         #labels = np.array([[1,0.4860586,0.4909233,0.07650164,0.02938423,-0.08001593,-0.0320636,0.008848786,0.01121643,-0.009032428,-0.0114491]])
         #labels = np.array([[1,0.5109575,0.4996452,0.06958157,0.03746924,-0.06275624,-0.03573748,-0.03004959,-0.004485548,0.03085494,0.0046057]])
-        labels = np.array([[1,0.1701979,0.2652104,-0.06756115,0.05552575,0.06555805,0.1032686,-0.05104199,-0.09671402,0.05564821,-0.0600368]])
-        
-        display(test_image, ['predict'], labels)
+        labels = np.array([[1, 0.1701979, 0.2652104, -0.06756115, 0.05552575,
+                          0.06555805, 0.1032686, -0.05104199, -0.09671402, 0.05564821, -0.0600368]])
 
-    
+        display(test_image, ['predict'], labels)
