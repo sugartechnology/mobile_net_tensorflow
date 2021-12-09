@@ -103,13 +103,16 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
     def get_image_output(self, input):
         h = self.input_size[0]
         w = self.input_size[0]
-        k = 21
+        k = 1
         b = self.batch_size
         output = np.zeros([b, k, w, h])
 
         for i, (keypoints) in enumerate(input):
             kp_array = np.zeros([k, w, h])
             for j, (kp) in enumerate(keypoints):
+
+                if j >= k:
+                    break
 
                 image = np.zeros([h, w])
 
@@ -127,7 +130,8 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
                 image[ceilX, ceilY] = 1
                 image[floorX, ceilY] = 1
                 image[ceilX, floorY] = 1
-                image = cv2.GaussianBlur(image, (3, 3), 0)
+                image2 = cv2.GaussianBlur(image, (51, 51), 0)
+                image += image2
 
                 kp_array[j] = image
 
@@ -148,9 +152,9 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
         sdx = index * self.batch_size % l
         edx = ((index + 1) * self.batch_size) % l
 
-        if self.batch_size > (l - sdx):
+        if self.batch_size >= (l - sdx):
             sdx -= l
-            if self.batch_size > (l - edx):
+            if self.batch_size >= (l - edx):
                 edx -= l
 
         Km = self.K_matrix[np.r_[sdx:edx]]
@@ -169,10 +173,16 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
 
     def get_input_data(self,  index):
 
-        sbx = index * self.batch_size
-        ebx = (index + 1) * self.batch_size % len(self.input_filepaths)
+        l = len(self.input_filepaths)
+        sbx = index * self.batch_size % l
+        ebx = (index + 1) * self.batch_size % l
 
-        batches_filepaths = self.input_filepaths[sbx: ebx]
+        if self.batch_size >= (l - sbx):
+            sbx -= l
+            if self.batch_size >= (l - sbx):
+                sbx -= l
+
+        batches_filepaths = self.input_filepaths[np.r_[sbx: ebx]]
 
         x0_batch = np.asarray([self.get_input(x)
                                for x in batches_filepaths])
@@ -193,26 +203,3 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
 
     def __len__(self):
         return int(self.n / 32)
-
-
-if __name__ == "__main__":
-    p = MobileUNetDataGen("/Users/yufae/Downloads/FreiHAND_pub_v2/training/rgb",
-                          "/Users/yufae/Downloads/FreiHAND_pub_v2/training",
-                          "/Users/yufae/Downloads/FreiHAND_pub_v2/training_K.json",
-                          "/Users/yufae/Downloads/FreiHAND_pub_v2/training_xyz.json"
-                          )
-
-    for i, item in enumerate(p):
-        for j, c in enumerate(item[0]):
-            cv2.imshow(str(j) + "", c)
-            cv2.imshow(str(-j) + "", item[1][j][0])
-
-        cv2.waitKey(2000)
-        cv2.destroyAllWindows()
-
-    '''output = p.get_output(1016, 0)
-
-    for im in output:
-        for im2 in im:
-            cv2.imshow("mat", im2)
-            cv2.waitKey(200)'''
