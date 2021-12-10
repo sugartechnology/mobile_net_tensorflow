@@ -1,7 +1,4 @@
-import imp
-from re import I
 import tensorflow as tf
-import pandas
 import os
 import numpy as np
 import cv2
@@ -44,6 +41,8 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
 
         # creat file path array
         self.input_filepaths = np.sort(os.listdir(self.image_directory))
+        self.input_filepaths = np.array([
+            k for k in self.input_filepaths if k.endswith('jpg')])
 
         fn_K_matrix = os.path.join(label_k)
         with open(fn_K_matrix, "r") as f:
@@ -55,34 +54,10 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
 
         self.n = len(self.input_filepaths)
 
-    def create_label_image(self, path):
-        '''
-            create label image for given image name
-        '''
-        None
-
-    def load_label_image(self, name):
-        '''
-            load label image for given image name
-            create a new one if it doesnt exist
-        '''
-        path = os.path.join(
-            self.label_directory, name[0] + ".png")
-
-        if not os.path.exists(path):
-            self.create_label_image(name)
-
-        image = tf.keras.preprocessing.image.load_img(path)
-        image_arr = tf.keras.preprocessing.image.img_to_array(image)
-        image_arr/255
-
-        return image_arr
-
-    def on_epoch_end(self):
-        # if self.shuffle:
-        #    self.df = self.df.sample(frac=1).reset_index(drop=True)
-        None
-
+    #
+    #
+    #
+    #
     def get_input(self, name):
         '''Gets image and resize it for given image file name'''
         path = os.path.join(self.image_directory, name)
@@ -136,7 +111,6 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
                 kp_array[j] = image
 
             output[i] = kp_array
-
         return output
 
     '''
@@ -199,7 +173,7 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
         x = self.get_input_data(index)
         y = self.get_output_data(index)
 
-        return x, y
+        return (x, y)
 
     def __len__(self):
-        return int(self.n / 32)
+        return int(self.n / self.batch_size)
