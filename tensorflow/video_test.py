@@ -4,6 +4,8 @@ from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import Model
 from numpy import expand_dims
+import math
+import numpy as np
 
 # define a video capture object
 vid = cv2.VideoCapture(0)
@@ -39,9 +41,20 @@ while(True):
                    color=(0, 0, 255),
                    thickness=1)'''
 
-    cv2.imshow('result', results[0][0])
 
-    cv2.imshow('frame', frame)
+    a = results[0][0]
+
+    x0 = math.ceil(np.argmax(a)/128)
+    x1 = math.floor(np.argmax(a)/128)
+
+    y0 = np.argmax(a) % 128
+
+    a = results[0][0] * 50
+
+    img[0] = cv2.circle(img[0], (x0, y0), 2, (255, 0, 0))
+    cv2.imshow('result', img[0])
+
+    cv2.imshow('frame', a)
 
     # the 'q' button is set as the
     # quitting button you may use any

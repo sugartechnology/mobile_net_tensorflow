@@ -27,7 +27,7 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
                  label_directory,
                  label_k,
                  label_position,
-
+                 file_range = (0, -1),
                  batch_size=32,
                  input_size=(128, 128, 3),
                  shuffle=True):
@@ -38,12 +38,15 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
         self.batch_size = batch_size
         self.input_size = input_size
         self.shuffle = shuffle
+        self.file_range_start = file_range[0] 
+        self.file_range_end =  file_range[1]
 
         # creat file path array
         self.input_filepaths = np.sort(os.listdir(self.image_directory))
         self.input_filepaths = np.array([
             k for k in self.input_filepaths if k.endswith('jpg')])
 
+    
         fn_K_matrix = os.path.join(label_k)
         with open(fn_K_matrix, "r") as f:
             self.K_matrix = np.array(json.load(f))
@@ -52,6 +55,8 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
         with open(fn_anno, "r") as f:
             self.xyz = np.array(json.load(f))
 
+
+        self.input_filepaths = self.input_filepaths[self.file_range_start: self.file_range_end]
         self.n = len(self.input_filepaths)
 
     #
@@ -91,24 +96,25 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
 
                 image = np.zeros([h, w])
 
-                floorX = int(math.floor(kp[0]))
-                floorY = int(math.floor(kp[1]))
-                ceilX = int(math.ceil(kp[0]))
-                ceilY = int(math.floor(kp[1]))
-
+                floorX = int(math.floor(kp[1]))
+                floorY = int(math.floor(kp[0]))
+               
                 floorX = floorX if floorX < 128 else 127
                 floorY = floorY if floorY < 128 else 127
-                ceilY = ceilY if ceilY < 128 else 127
-                ceilX = ceilX if ceilX < 128 else 127
 
-                image[floorX, floorY] = 1
-                image[ceilX, ceilY] = 1
-                image[floorX, ceilY] = 1
-                image[ceilX, floorY] = 1
-                image2 = cv2.GaussianBlur(image, (51, 51), 0)
-                image += image2
+                for ix in range(4):
+                    for iy in range(4):
+                        xx = floorX-2 +ix
+                        yy = floorY-2 +iy
+                        xx = xx if xx < 128 else 127
+                        yy = yy if yy < 128 else 127
+                        image[xx, yy] = 1
+        
+                #image1 = cv2.circle(image, (floorY, floorX), 1, (255, 255, 255), -1)
+                image2 = cv2.GaussianBlur(image, (3, 3), 0)
+                #image += image2
 
-                kp_array[j] = image
+                kp_array[j] = image2
 
             output[i] = kp_array
         return output
@@ -172,6 +178,18 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
 
         x = self.get_input_data(index)
         y = self.get_output_data(index)
+
+        '''for i, xFrame in enumerate(x):
+            
+            a = y[i][0]
+
+            cv2.imshow("o", a)
+            x0 = math.ceil(np.argmax(a)%128)
+            y0 = math.ceil(np.argmax(a) / 128)
+
+            xFrame = cv2.circle(xFrame, (x0, y0), 5, (255, 0, 0))
+            cv2.imshow("i", xFrame)
+            cv2.waitKey(-1)'''
 
         return (x, y)
 

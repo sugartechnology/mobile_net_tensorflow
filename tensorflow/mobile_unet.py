@@ -83,17 +83,18 @@ def build_mobile_net_unet(input_shape):
 
     model = Model(inputs, output, name="Mobile_Unet")
 
-    model.summary()
+    # model.summary()
 
     # model = CustomModel()
     adamOptimizer = tf.keras.optimizers.Adam(
-        learning_rate=1e-3,
+        learning_rate=1e-1,
         name='Adam'
     )
-
+    print("after adam")
     model.compile(optimizer=adamOptimizer,
                   loss=mobile_unet_loss_function, metrics=[mobile_unet_acc_function])
 
+    print("after compile")
     return model
 
 
@@ -123,6 +124,7 @@ def load_model(save_path=None, weights_path=None):
             print('***************************')
             print('creating model from scratch')
 
+    print("***---****---***---***---")
     return model
 
 
@@ -135,11 +137,19 @@ if __name__ == "__main__":
     print("waihgts path", weights_path)
     model = load_model(weights_path=weights_path)
 
-    data_sets = MobileUNetDataGen("/Users/yufae/Downloads/FreiHAND_pub_v2_test/training/rgb",
-                                  "/Users/yufae/Downloads/FreiHAND_pub_v2_test/training",
-                                  "/Users/yufae/Downloads/FreiHAND_pub_v2_test/training_K.json",
-                                  "/Users/yufae/Downloads/FreiHAND_pub_v2_test/training_xyz.json",
-                                  batch_size=batch_size)
+    data_sets = MobileUNetDataGen("/Users/yufae/Downloads/FreiHAND_pub_v2/training/rgb",
+                                  "/Users/yufae/Downloads/FreiHAND_pub_v2/training",
+                                  "/Users/yufae/Downloads/FreiHAND_pub_v2/training_K.json",
+                                  "/Users/yufae/Downloads/FreiHAND_pub_v2/training_xyz.json",
+                                  batch_size=batch_size,
+                                  file_range=(0, 100239))
+
+    val_sets = MobileUNetDataGen("/Users/yufae/Downloads/FreiHAND_pub_v2/training/rgb",
+                                  "/Users/yufae/Downloads/FreiHAND_pub_v2/training",
+                                  "/Users/yufae/Downloads/FreiHAND_pub_v2/training_K.json",
+                                  "/Users/yufae/Downloads/FreiHAND_pub_v2/training_xyz.json",
+                                  batch_size=batch_size,
+                                  file_range=(100239, -1))
 
     checkpoint_filepath = weights_path
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -156,6 +166,7 @@ if __name__ == "__main__":
     training_history = model.fit(
         data_sets,
         epochs=epochs,
+        validation_data=val_sets,
         callbacks=[tensorboard_callback, model_checkpoint_callback])
 
     model.save_weights(weights_path)
