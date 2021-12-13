@@ -43,6 +43,9 @@ def conv_block(inputs, num_filters):
     x = Conv2D(num_filters, 3, padding="same")(inputs)
     x = BatchNormalization()(x)
     x = ReLU()(x)
+    x = Conv2D(num_filters, 3, padding="same")(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
     return x
 
 
@@ -65,7 +68,7 @@ def build_mobile_net_unet(input_shape):
 
     inputs = Input(shape=input_shape)
 
-    model_neurons = 16
+    model_neurons = 8
     e1 = encoder_block(inputs, model_neurons)
     e2 = encoder_block(e1, model_neurons * 2)
     e3 = encoder_block(e2, model_neurons * 4)
