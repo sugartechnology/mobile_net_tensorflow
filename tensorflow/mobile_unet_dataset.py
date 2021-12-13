@@ -66,13 +66,11 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
     def get_input(self, name):
         '''Gets image and resize it for given image file name'''
         path = os.path.join(self.image_directory, name)
-        image = tf.keras.preprocessing.image.load_img(path)
-        image_arr = tf.keras.preprocessing.image.img_to_array(image)
+        image = cv2.imread(path)
 
-        image_arr = tf.image.resize(
-            image_arr, (self.input_size[0], self.input_size[1])).numpy()
-
-        return image_arr/255.
+        image = cv2.resize(image, (self.input_size[0], self.input_size[1]))
+    
+        return image
 
     '''
     
@@ -111,7 +109,8 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
                         image[xx, yy] = 1
         
                 #image1 = cv2.circle(image, (floorY, floorX), 1, (255, 255, 255), -1)
-                image2 = cv2.GaussianBlur(image, (3, 3), 0)
+                image2 = cv2.GaussianBlur(image, (51, 51), 3)
+                image2 = image2 / image2.max()
                 #image += image2
 
                 kp_array[j] = image2
@@ -187,7 +186,7 @@ class MobileUNetDataGen(tf.keras.utils.Sequence):
             x0 = math.ceil(np.argmax(a)%128)
             y0 = math.ceil(np.argmax(a) / 128)
 
-            xFrame = cv2.circle(xFrame, (x0, y0), 5, (255, 0, 0))
+            xFrame = cv2.circle(xFrame, (x0, y0), 5, (255, 0, 0), -1)
             cv2.imshow("i", xFrame)
             cv2.waitKey(-1)'''
 

@@ -22,11 +22,12 @@ while(True):
     frame = cv2.resize(frame, (128, 128))
     # Display the resulting frame
 
+    print(frame.shape)
     # expand dimensions so that it represents a single 'sample'
     img = expand_dims(frame.astype("float64"), axis=0)
 
     # prepare the image (e.g. scale pixel values for the vgg)
-    img *= 1/255
+    #img *= 1/255
 
     # get feature map for first hidden layer
     results = model.predict(img)
